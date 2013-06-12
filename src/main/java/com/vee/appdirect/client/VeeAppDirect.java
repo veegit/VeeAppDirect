@@ -3,6 +3,7 @@ package com.vee.appdirect.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.vee.appdirect.client.fx.FXGrid;
+import com.vee.appdirect.client.fx.MyPortal;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -17,6 +18,6 @@ public class VeeAppDirect implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		RootPanel.get().add(new FXGrid());
+		RootPanel.get().add(new MyPortal());
 	}
 }

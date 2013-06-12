@@ -3,6 +3,8 @@ package com.vee.appdirect.server.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,6 +55,8 @@ public class XmlTreeServlet extends HttpServlet {
 		String xml = "";
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
+		List<FXRate> fxRates = new ArrayList<FXRate>();
+		
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document newdoc = dBuilder.newDocument();
@@ -74,27 +78,31 @@ public class XmlTreeServlet extends HttpServlet {
 				
 			for (int i = 2; i < list.getLength(); i++) {
 				node = list.item(i);
-				Element fxrate = newdoc.createElement("fxrate");
-				rootElement.appendChild(fxrate);
+				Element fxrateelem = newdoc.createElement("fxrate");
+				rootElement.appendChild(fxrateelem);
 				
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element element = (Element) node;
-		 			
-					Element time = newdoc.createElement("time");
-		 			time.appendChild(newdoc.createTextNode(timeStr));
-		 			fxrate.appendChild(time);
+		 			FXRate fxRate = new FXRate("EUR",
+		 					element.getAttribute("currency"),
+		 					Double.parseDouble(element.getAttribute("rate")),
+		 					timeStr);
+		 			fxRates.add(fxRate);
+					Element updated = newdoc.createElement("updated");
+					updated.appendChild(newdoc.createTextNode(fxRate.getUpdated()));
+					fxrateelem.appendChild(updated);
 		 			
 		 			Element source = newdoc.createElement("source");
-		 			source.appendChild(newdoc.createTextNode("EUR"));
-	 				fxrate.appendChild(source);
+		 			source.appendChild(newdoc.createTextNode(fxRate.getSourceCurrency()));
+		 			fxrateelem.appendChild(source);
 	 				
 		 			Element destination = newdoc.createElement("destination");
-		 			destination.appendChild(newdoc.createTextNode(element.getAttribute("currency")));
-	 				fxrate.appendChild(destination);
+		 			destination.appendChild(newdoc.createTextNode(fxRate.getDestCurrency()));
+		 			fxrateelem.appendChild(destination);
 	 				
 	 				Element rate = newdoc.createElement("rate");
-	 				rate.appendChild(newdoc.createTextNode(element.getAttribute("rate")));
-	 				fxrate.appendChild(rate);
+	 				rate.appendChild(newdoc.createTextNode(fxRate.getRate()+""));
+	 				fxrateelem.appendChild(rate);
 				}
 			}
 			
