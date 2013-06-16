@@ -1,31 +1,33 @@
-package com.vee.appdirect.server.servlet;
+package com.vee.appdirect.server.beans;
+
+import java.util.Date;
 
 public class FXRate {
 	String sourceCurrency;
 	String destCurrency;
 	Double rate;
-	String updated;
+	Date updated;
 	
-	FXRate(String sourceCurrency,String destCurrency, Double rate, String updated) {
+	public FXRate(String sourceCurrency,String destCurrency, Double rate, Date updated) {
 		this.sourceCurrency = sourceCurrency;
 		this.destCurrency = destCurrency;
 		this.rate = rate;
 		this.updated = updated;
 	}
 	
-	String getSourceCurrency() {
+	public String getSourceCurrency() {
 		return sourceCurrency;
 	}
     
-    String getDestCurrency() {
+	public String getDestCurrency() {
     	return destCurrency;
     }
  
-    Double getRate() {
+	public Double getRate() {
     	return rate;
     }
  
-    String getUpdated() {
+	public Date getUpdated() {
     	return updated;
     }
 }

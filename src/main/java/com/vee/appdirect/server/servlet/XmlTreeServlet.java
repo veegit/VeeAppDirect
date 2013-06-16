@@ -3,7 +3,11 @@ package com.vee.appdirect.server.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -27,10 +31,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.vee.appdirect.server.beans.FXRate;
+
 public class XmlTreeServlet extends HttpServlet {
 	private static final String PATH = "http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml";
+	private static final String SOURCE_DATE_FORMAT_STR = "yyyy-mm-dd";
+	private static final SimpleDateFormat SOURCE_DATE_FORMAT = new SimpleDateFormat(SOURCE_DATE_FORMAT_STR);
 	private static final long serialVersionUID = -597731200175989406L;
 	private static Logger log = LogManager.getLogger(XmlTreeServlet.class);
+	
 	static {
 		System.setProperty("http.proxyHost", "gdcnetcache.us.db.com");
 		System.setProperty("http.proxyPort", "3128");
@@ -70,10 +79,11 @@ public class XmlTreeServlet extends HttpServlet {
 			NodeList list = doc.getElementsByTagName("Cube");
 			
 			Node node = list.item(1);
-			String timeStr=  "";
+			Date updated = Calendar.getInstance().getTime();
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) node;
-				timeStr = element.getAttribute("time");
+				String timeStr = element.getAttribute("time");
+				updated = SOURCE_DATE_FORMAT.parse(timeStr);
 			}
 				
 			for (int i = 2; i < list.getLength(); i++) {
@@ -86,11 +96,12 @@ public class XmlTreeServlet extends HttpServlet {
 		 			FXRate fxRate = new FXRate("EUR",
 		 					element.getAttribute("currency"),
 		 					Double.parseDouble(element.getAttribute("rate")),
-		 					timeStr);
+		 					updated);
 		 			fxRates.add(fxRate);
-					Element updated = newdoc.createElement("updated");
-					updated.appendChild(newdoc.createTextNode(fxRate.getUpdated()));
-					fxrateelem.appendChild(updated);
+					Element updated12 = newdoc.createElement("updated");
+					updated12.appendChild(newdoc.createTextNode(
+							SOURCE_DATE_FORMAT.format(fxRate.getUpdated())));
+					fxrateelem.appendChild(updated12);
 		 			
 		 			Element source = newdoc.createElement("source");
 		 			source.appendChild(newdoc.createTextNode(fxRate.getSourceCurrency()));
@@ -112,13 +123,15 @@ public class XmlTreeServlet extends HttpServlet {
 			transformer.transform(new DOMSource(newdoc), new StreamResult(writer));
 			xml = writer.getBuffer().toString();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (SAXException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} catch (TransformerException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
+		} catch (ParseException e) {
+			log.error(e.getMessage());
 		}
 		return xml;
 	}
