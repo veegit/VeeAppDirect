@@ -25,6 +25,15 @@
 		<url-pattern>/veeappdirect/create</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+		<servlet-name>pairs</servlet-name>
+		<servlet-class>com.vee.appdirect.server.servlet.FetchAllPricesServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+		<servlet-name>pairs</servlet-name>
+		<url-pattern>/veeappdirect/fx/pairs</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
